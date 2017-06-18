@@ -1,6 +1,3 @@
+const StorageWrapper = require('./storage-wrapper');
 
-module.exports =  {
-
-    method:()=>{}
-
-};
+module.exports.StorageWrapper = StorageWrapper;

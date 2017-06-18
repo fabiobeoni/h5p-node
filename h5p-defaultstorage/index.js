@@ -34,6 +34,10 @@ class Storage {
         this._basePath = basePath;
     }
 
+    static getContentPath(contentID) {
+        return path.join(this._basePath, CONTENT_PATH, contentID);
+    }
+
     /**
      * Async stores the h5p library folder
      * by selecting the library by the
@@ -64,11 +68,11 @@ class Storage {
      * the main content app storage path and content
      * ID.
      * @param sourcePath {string}: content source path
-     * @param content {object}: content properties
+     * @param contentID {string}: id of the content to store
      * @returns {Promise.<boolean>}
      */
-    async saveContent(sourcePath,content){
-        let destPath = path.join(this._basePath,CONTENT_PATH,content['id'].toString());
+    async saveContent(sourcePath,contentID){
+        let destPath = Storage.getContentPath(contentID);
 
         // Make sure destination dir doesn't exist
         await this.deepDelete(destPath);
@@ -79,6 +83,16 @@ class Storage {
         let files = await fsx.readdir(destPath);
 
         return (files.length>0);
+    }
+
+    /**
+     * Async removes all library contents
+     * at the given location by content ID.
+     * @param contentID {string}: content to be deleted
+     * @returns {Promise.<void>}
+     */
+    async deleteCotent(contentID){
+        await this.deepDelete(Storage.getContentPath(contentID));
     }
 
     /**
