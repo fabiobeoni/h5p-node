@@ -1,27 +1,27 @@
-const AbstractStorageStrategy = require('./h5p-abstractstoragestrategy');
+const AbstractLibraryManagementStrategy = require('./AbstractLibraryManagementStrategy');
 
 
-const MESSAGE_WRONG_CLASS = 'The provided class is doesn\'t extend the required AbstractStorageStrategy.';
+const MESSAGE_WRONG_CLASS = 'The provided class is doesn\'t extend the required AbstractLibraryManagementStrategy.';
 
 
 /**
  * This class provides an API to interact
- * with different types of storage strategies
+ * with different types of library management strategies
  * (eg.: OS file-system, cloud storage, others)
  * by a shared interface with common methods.
- * The Storage Client also allows to change
- * from one strategy to another, to allow storage
+ * It also allows to change
+ * from one strategy to another, to allow manage
  * of different resources on different kind of
  * storage (eg.: configurations on a db, images
  * on cloud storage).
  */
-class StorageClient {
+class LibraryManager {
 
     /**
      * Initializes the client and make
      * it working with the preferred
      * storage strategy.
-     * @param storageStrategy {AbstractStorageStrategy}
+     * @param storageStrategy {AbstractLibraryManagementStrategy}
      */
     constructor(storageStrategy){
         this.setStrategy(storageStrategy);
@@ -30,15 +30,18 @@ class StorageClient {
     /**
      * Instruct the client what strategy
      * your webapp will use to store objects.
-     * @param storageStrategy {AbstractStorageStrategy}
+     * @param storageStrategy {AbstractLibraryManagementStrategy}
      */
     setStrategy(storageStrategy){
-        if(!(Object.getPrototypeOf(storageStrategy) instanceof AbstractStorageStrategy))
+        if(!(Object.getPrototypeOf(storageStrategy) instanceof AbstractLibraryManagementStrategy))
             throw MESSAGE_WRONG_CLASS;
 
         this.storageStrat = storageStrategy;
     }
 
+
+
+    //TODO: update method signatures
 
     static getContentPath(contentID) {
         return this.storageStrat.getContentPath(contentID);
@@ -66,4 +69,4 @@ class StorageClient {
 
 }
 
-module.exports = StorageClient;
+module.exports = LibraryManager;

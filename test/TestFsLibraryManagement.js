@@ -9,11 +9,11 @@ describe('TESTING DEFAULT STORAGE:', ()=> {
         let isFullyStored = false;
 
         try{
-            let fsStorage = new H5PLib.FSStorageStrategy({
+            let fsMngStrat = new H5PLib.FsLibraryManagementStrategy({
                 basePath:'./' //WEB APP ROOT
             });
 
-            let storageClient = new H5PLib.StorageClient(fsStorage);
+            let libMng = new H5PLib.LibraryManager(fsMngStrat);
 
             let libraryDef = new H5PLib.LibraryDefinition();
             libraryDef.majorVersion = 1;
@@ -22,7 +22,7 @@ describe('TESTING DEFAULT STORAGE:', ()=> {
             libraryDef.name = 'mylib';
             libraryDef.uploadDirectory = './temp-upload';
 
-            isFullyStored = await storageClient.saveLibrary(libraryDef);
+            isFullyStored = await libMng.saveLibrary(libraryDef);
         }
         catch (err){
             console.error(err);

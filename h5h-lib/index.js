@@ -1,4 +1,4 @@
-module.exports.LibraryDefinition = require('./h5p-libdefinition');
-module.exports.AbstractStorageStrategy = require('./h5p-abstractstoragestrategy');
-module.exports.FSStorageStrategy = require('./h5p-fsstoragestrategy');
-module.exports.StorageClient = require('./h5p-storageclient');
+module.exports.LibraryDefinition = require('./LibraryDefinition');
+module.exports.AbstractLibraryManagementStrategy = require('./AbstractLibraryManagementStrategy');
+module.exports.FsLibraryManagementStrategy = require('./FsLibraryManagementStrategy');
+module.exports.LibraryManager = require('./LibraryManager');

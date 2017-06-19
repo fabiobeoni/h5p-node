@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "dir-compare": "^1.4.0",
-    "fs-extra": "^3.0.1"
+    "fs-extra": "^3.0.1",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "jasmine-node": "^1.14.5",
