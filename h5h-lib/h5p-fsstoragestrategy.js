@@ -2,6 +2,7 @@ const fsx = require('fs-extra');
 const path = require('path');
 const dirCompare = require('dir-compare');
 
+const AbstractStorageStrategy = require('./h5p-abstractstoragestrategy');
 
 const LIBRARIES_PATH = 'libraries';
 const CONTENT_PATH = 'content';
@@ -15,25 +16,26 @@ const CONTENT_PATH = 'content';
  * (developed in PHP), this class
  * makes use of the OS file-system
  * to as data storage.
- * By the way, the class also acts
- * as a "contract definition", so future
- * implementations of a data layer, based
- * on different data storage (eg. cloud
- * storage), will implement methods with
- * the same signatures as this class does.
  *
  * https://h5ptechnology.atlassian.net/browse/HFP-1202
  */
-class Storage {
+class FSStorageStrategy extends AbstractStorageStrategy {
 
     /**
-     * Initializes the Storage
-     * @param basePath {string}: defines the base path to work with where h5p libraries, it is a sub-path of the app root.
+     * Initializes the FSStorageStrategy
+     * @param opts.basePath {string}: defines the base path to work with where h5p libraries, it is a sub-path of the app root.
      */
-    constructor(basePath){
-        this._basePath = basePath;
+    constructor(opts){
+        super();
+        this._basePath = opts.basePath;
     }
 
+    /**
+     * Returns the path where h5p library
+     * contents are stored, based on the
+     * content ID.
+     * @param contentID {string}
+     */
     static getContentPath(contentID) {
         return path.join(this._basePath, CONTENT_PATH, contentID);
     }
@@ -72,7 +74,7 @@ class Storage {
      * @returns {Promise.<boolean>}
      */
     async saveContent(sourcePath,contentID){
-        let destPath = Storage.getContentPath(contentID);
+        let destPath = FSStorageStrategy.getContentPath(contentID);
 
         // Make sure destination dir doesn't exist
         await this.deepDelete(destPath);
@@ -91,8 +93,8 @@ class Storage {
      * @param contentID {string}: content to be deleted
      * @returns {Promise.<void>}
      */
-    async deleteCotent(contentID){
-        await this.deepDelete(Storage.getContentPath(contentID));
+    async deleteContent(contentID){
+        await this.deepDelete(FSStorageStrategy.getContentPath(contentID));
     }
 
     /**
@@ -122,4 +124,4 @@ class Storage {
 
 }
 
-module.exports = Storage;
+module.exports = FSStorageStrategy;
