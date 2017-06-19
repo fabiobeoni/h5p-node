@@ -1,31 +1,28 @@
 /**
  * Object describing the H5P library definition.
- *
- * @type {{machineName: '', name: '', majorVersion: 0, minorVersion: 0, uploadDirectory:''}}
+ * @link https://h5p.org/library-definition#libcoreApi
  */
 class LibraryDefinition {
 
-    constructor(){
-        this.title = '';
-        this.description = '';
-        this.machineName = '';
-        this.name = '';
-        this.majorVersion = 0;
-        this.minorVersion = 0;
-        this.patchVersion = 0;
-        this.author = '';
-        this.license = '';
-        this.runnable = 0;
-        this.embedTypes = [];
-        this.fullscreen = 0;
-        this.coreApi = null; //object
-        this.preloadedCss = [];
-        this.preloadedJs = [];
-        this.preloadedDependencies = [];
+    title = '';
+    description = '';
+    machineName = '';
+    name = '';
+    majorVersion = 0;
+    minorVersion = 0;
+    patchVersion = 0;
+    author = '';
+    license = '';
+    runnable = 0;
+    embedTypes = [];
+    fullscreen = 0;
+    coreApi = null; //object
+    preloadedCss = [];
+    preloadedJs = [];
+    preloadedDependencies = [];
 
-        //TODO: check with authors, avaiblable in PHP code, not in docs (https://h5p.org/library-definition#libcoreApi)
-        this.uploadDirectory = '';
-    }
+    //TODO: check with authors, available in PHP code, not in docs (https://h5p.org/library-definition#libcoreApi)
+    uploadDirectory = '';
 
     /**
      * Returns the object with the following
@@ -37,7 +34,7 @@ class LibraryDefinition {
      */
     asString(nospaces){
         this.machineName = this.machineName || this.name;
-        return (this.machineName.toString() + (!nospaces ? ' ' : '-') + this.majorVersion.toString() + '.' + this.minorVersion.toString());
+        return (this.machineName + (!nospaces ? ' ' : '-') + this.majorVersion.toString() + '.' + this.minorVersion.toString());
     }
 }
 
