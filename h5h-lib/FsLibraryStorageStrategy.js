@@ -3,8 +3,13 @@ const path = require('path');
 const AbstractLibraryStorageStrategy = require('./AbstractLibraryStorageStrategy');
 const FileSystemDAL = require('./FileSystemDAL');
 
-const LIBRARIES_PATH = 'libraries'; //must grant write permission to the web app process.
-const CONTENT_PATH = 'content'; //must grant write permission to the web app process.
+const LIBRARIES_PATH = 'libraries';
+const CONTENT_PATH = 'content';
+const EXPORTS_PATH = 'exports';
+const CACHED_ASSETS_PATH = '/cachedassets/';
+
+const JS_EXT = '.js';
+const CSS_EXT = '.css';
 
 
 /**
@@ -23,11 +28,26 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
 
     /**
      * Initializes the FsLibraryStorageStrategy
-     * @param opts.basePath {string}: defines the base path to work with where h5p libraries, it is a sub-path of the app root.
+     * @param opts.basePath {string}:
+     * defines the base path to work with
+     * where h5p files, it is a sub-path
+     * of the app root.
+     * NOTE: Web app process must have write
+     * permission to it.
      */
     constructor(opts){
         super();
         this._basePath = opts.basePath;
+
+        //creates all needed sub paths to work with...
+        Promise.all([
+            FileSystemDAL.ensurePath(path.join(this._basePath,LIBRARIES_PATH)),
+            FileSystemDAL.ensurePath(path.join(this._basePath,EXPORTS_PATH)),
+            FileSystemDAL.ensurePath(path.join(this._basePath,CONTENT_PATH)),
+            FileSystemDAL.ensurePath(path.join(this._basePath,CACHED_ASSETS_PATH))
+        ])
+            .then(console.log('H5P required paths created'))
+            .catch(err=>console.error(err));
     }
 
     /**
@@ -160,6 +180,132 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
             return true;
         }
     };
+
+    /**
+     * Exports a file (typically .h5p zipped file)
+     * to the app export directory.
+     * @param sourceExportName {string} this is the equivalent of a short file name (without path)
+     * @param outputExportName {string} this is the equivalent of a short file name (without path)
+     * @return {Promise.<boolean>}
+     */
+    async saveExport(sourceExportName,outputExportName){
+        //deletes if any...
+        await this.deleteExport(outputExportName);
+
+        //performs the copy
+        return await FileSystemDAL.deepCopy(
+            path.join(EXPORTS_PATH,sourceExportName),
+            path.join(EXPORTS_PATH,outputExportName),
+            false
+        );
+    }
+
+    /**
+     * Deletes the given export file
+     * from the app exports path.
+     * @param exportName {string} this is the equivalent of a short file name (without path)
+     * @return {Promise.<void>}
+     */
+    async deleteExport(exportName){
+        await FileSystemDAL.deepDelete(path.join(EXPORTS_PATH,exportName));
+    }
+
+    /**
+     * Returns true if a export file with
+     * given name exists in the app exports
+     * path.
+     * @param exportName {string} this is the equivalent of a short file name (without path)
+     * @return {Promise.<boolean>}
+     */
+    async exportExists(exportName){
+        await FileSystemDAL.resourceExists(path.join(EXPORTS_PATH,exportName));
+    };
+
+    /**
+     * Concatenates all JavaScrips and Stylesheets into two files in order
+     * to improve page load performance.
+     * @param files {string[]} a set of all the assets required for content to display
+     * @param key {string} hashed key for the cached asset
+     * @return {Promise.<void>}
+     */
+    async cacheAssets(files,key){
+        //code is not really clear to me, asked question on slack
+        //https://h5ptechnology.slack.com/archives/C36BURHFH/p1498053590297468
+
+        //According to Joubel (https://h5ptechnology.slack.com/archives/C36BURHFH/p1498053967451612)
+        //"files" input should be:
+        /*
+        * {
+         scripts: [{path: '', version: ''},{path: '', version: ''}]
+         styles: [{path: '', version: ''},{path: '', version: ''}]
+         }
+        * */
+    }
+
+    /**
+     * Checks if there are cache assets available for content
+     * and returns them if any. Typical output:
+     * @param key {string}
+     * @return {Promise.<object>} object or null.
+     *
+     * <pre><code>
+     * {
+     *  scripts:[{
+     *      path:'path/to/JS/file/based/on/KEY',
+     *      version:''
+     *  }],
+     *  styles:[{
+     *      path:'path/to/CSS/file/based/on/KEY',
+     *      version:''
+     *  }]
+     * }
+     * </code></pre>
+     */
+    async getCachedAssets(key){
+        let files = {};
+
+        let jsCachedFile = this.getCachedAssetsSrc(key,JS_EXT);
+        let cssCachedFile = this.getCachedAssetsSrc(key,CSS_EXT);
+
+        if(FileSystemDAL.resourceExists(jsCachedFile))
+            files.scripts = [{
+                path:jsCachedFile,
+                version:''
+            }];
+
+        if(FileSystemDAL.resourceExists(cssCachedFile))
+            files.styles =[{
+                path:cssCachedFile,
+                version:''
+            }];
+
+        return (files.length>0 ? files : null);
+    }
+
+    /**
+     * Returns a temp dir with unique name.
+     * Not sure that is really needed in
+     * nodejs.
+     * //TODO: later when you have more knowledge of the h5p framework check this
+     * @php H5PDefaultStorage.getTmpPath()
+     * @return {Promise.<string>}
+     */
+    async getWritableTempPath(){
+        return await FsLibraryStorageStrategy.getWritableTempPath(this._basePath);
+    }
+
+    /**
+     * Returns the value for the
+     * src property of a <script>
+     * or <style> element to include
+     * some assets.
+     * @param key {string}
+     * @param ext {string} ".js", ".css"
+     * @return {string}
+     */
+    getCachedAssetsSrc(key,ext){
+        return (CACHED_ASSETS_PATH+`${key}.${ext}`);
+    }
 
 }
 

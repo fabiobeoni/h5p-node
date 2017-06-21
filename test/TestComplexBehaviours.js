@@ -20,7 +20,7 @@ describe('H5P Libraries Management:', ()=> {
 
         try{
             let fsMngStrat = new H5PLib.FsLibraryStorageStrategy({
-                basePath:'./' //WEB APP ROOT
+                basePath:'./h5p-packages'
             });
 
             let libMng = new H5PLib.LibraryManager(fsMngStrat);

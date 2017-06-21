@@ -81,6 +81,72 @@ class AbstractLibraryStorageStrategy {
     async exportLibrary(libDef,targetPath,devPath){throw MESSAGE+'exportLibrary().';}
 
     /**
+     * Exports a file (typically .h5p zipped file)
+     * to the app export directory.
+     * @param sourceExportName {string} this is the equivalent of a short file name (without path)
+     * @param outputExportName {string} this is the equivalent of a short file name (without path)
+     * @return {Promise.<boolean>}
+     */
+    async saveExport(sourceExportName,outputExportName){throw MESSAGE+'saveExport().';}
+
+    /**
+     * Deletes the given export file
+     * from the app exports path.
+     * @param exportName {string} this is the equivalent of a short file name (without path)
+     * @return {Promise.<void>}
+     */
+    async deleteExport(exportName){throw MESSAGE+'deleteExport().';}
+
+    /**
+     * Returns true if a export file with
+     * given name exists in the app exports
+     * path.
+     * @param exportName {string} this is the equivalent of a short file name (without path)
+     * @return {Promise.<boolean>}
+     */
+    async exportExists(exportName){throw MESSAGE+'exportExists().';};
+
+    /**
+     * Concatenates all JavaScrips and Stylesheets into two files in order
+     * to improve page load performance.
+     * @param files {string[]} a set of all the assets required for content to display
+     * @param key {string} hashed key for the cached asset
+     * @return {Promise.<void>}
+     */
+    async cacheAssets(files,key){throw MESSAGE+'cacheAssets()';}
+
+    /**
+     * Checks if there are cache assets available for content
+     * and returns them if any. Typical output:
+     * @param key {string}
+     * @return {Promise.<object>} object or null.
+     *
+     * <pre><code>
+     * {
+     *  scripts:[{
+     *      path:'path/to/JS/file/based/on/KEY',
+     *      version:''
+     *  }],
+     *  styles:[{
+     *      path:'path/to/CSS/file/based/on/KEY',
+     *      version:''
+     *  }]
+     * }
+     * </code></pre>
+     */
+    async getCachedAssets(key){throw MESSAGE+'getCachedAssets()';}
+
+    /**
+     * Returns a temp dir with unique name.
+     * Not sure that is really needed in
+     * nodejs.
+     * //TODO: later when you have more knowledge of the h5p framework check this
+     * @php H5PDefaultStorage.getTmpPath()
+     * @return {Promise.<string>}
+     */
+    async getWritableTempPath(){throw MESSAGE+'getWritableTempPath().';}
+
+    /**
      * Gets the path of the given library
      * relative to the general libraries
      * store in the web app.
