@@ -225,7 +225,7 @@ class FileSystemDAL {
         //options (useful for testing
         // the results)
         return {
-            allowedList:allowedList, //TODO: must be list of abs file names
+            allowedList:allowedList,
             ignoreOpts:ignoreOpts
         };
     }
