@@ -1,11 +1,11 @@
-const MESSAGE = 'Missing implementation of method AbstractLibraryManagementStrategy.';
+const MESSAGE = 'Missing implementation of method AbstractLibraryStorageStrategy.';
 
 /**
  * This class defines an "interface"
  * to implement multiple storage
  * strategies.
  */
-class AbstractLibraryManagementStrategy {
+class AbstractLibraryStorageStrategy {
 
     /**
      * Returns the path where h5p library
@@ -91,4 +91,4 @@ class AbstractLibraryManagementStrategy {
 
 }
 
-module.exports = AbstractLibraryManagementStrategy;
+module.exports = AbstractLibraryStorageStrategy;

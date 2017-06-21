@@ -1,15 +1,25 @@
+/**
+ * This test is a selection of the most
+ * complex functions performed by the
+ * framework that is crucial to test.
+ * The test uses data from ./test/sample-data
+ * folder.
+ */
 const assert = require('assert');
 
 const H5PLib = require('../h5h-lib');
+const TestVars = require('./SharedTestVars');
 
 
-describe('TESTING DEFAULT STORAGE:', ()=> {
 
-    it('SAVING LIBRARY FROM UPLOADED PATH TO DESTINATION', async ()=> {
+describe('H5P Libraries Management:', ()=> {
+
+    //Requires writable folder
+    it('Saves h5p package from upload folder to libraries repository', async ()=> {
         let isFullyStored = false;
 
         try{
-            let fsMngStrat = new H5PLib.FsLibraryManagementStrategy({
+            let fsMngStrat = new H5PLib.FsLibraryStorageStrategy({
                 basePath:'./' //WEB APP ROOT
             });
 
@@ -20,7 +30,7 @@ describe('TESTING DEFAULT STORAGE:', ()=> {
             libraryDef.minorVersion =0;
             libraryDef.machineName = 'MyLib';
             libraryDef.name = 'mylib';
-            libraryDef.uploadDirectory = './temp-upload';
+            libraryDef.uploadDirectory = TestVars.SAMPLE_LIBRARY_PATH;
 
             isFullyStored = await libMng.saveLibrary(libraryDef);
         }

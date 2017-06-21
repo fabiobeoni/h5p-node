@@ -1,7 +1,7 @@
-const AbstractLibraryManagementStrategy = require('./AbstractLibraryManagementStrategy');
+const AbstractLibraryStorageStrategy= require('./AbstractLibraryStorageStrategy');
 
 
-const MESSAGE_WRONG_CLASS = 'The provided class is doesn\'t extend the required AbstractLibraryManagementStrategy.';
+const MESSAGE_WRONG_CLASS = 'The provided class is doesn\'t extend the required AbstractLibraryStorageStrategy.';
 
 
 /**
@@ -21,7 +21,7 @@ class LibraryManager {
      * Initializes the client and make
      * it working with the preferred
      * storage strategy.
-     * @param storageStrategy {AbstractLibraryManagementStrategy}
+     * @param storageStrategy {AbstractLibraryStorageStrategy}
      */
     constructor(storageStrategy){
         this.setStrategy(storageStrategy);
@@ -30,10 +30,10 @@ class LibraryManager {
     /**
      * Instruct the client what strategy
      * your webapp will use to store objects.
-     * @param storageStrategy {AbstractLibraryManagementStrategy}
+     * @param storageStrategy {AbstractLibraryStorageStrategy}
      */
     setStrategy(storageStrategy){
-        if(!(Object.getPrototypeOf(storageStrategy) instanceof AbstractLibraryManagementStrategy))
+        if(!(Object.getPrototypeOf(storageStrategy) instanceof AbstractLibraryStorageStrategy))
             throw MESSAGE_WRONG_CLASS;
 
         this.storageStrat = storageStrategy;
@@ -43,7 +43,7 @@ class LibraryManager {
 
     //TODO: update method signatures
 
-    static getContentPath(contentID) {
+    getContentPath(contentID) {
         return this.storageStrat.getContentPath(contentID);
     }
 

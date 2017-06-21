@@ -1,6 +1,6 @@
 const path = require('path');
 
-const AbstractLibraryManagementStrategy = require('./AbstractLibraryManagementStrategy');
+const AbstractLibraryStorageStrategy = require('./AbstractLibraryStorageStrategy');
 const FileSystemDAL = require('./FileSystemDAL');
 
 const LIBRARIES_PATH = 'libraries'; //must grant write permission to the web app process.
@@ -19,23 +19,15 @@ const CONTENT_PATH = 'content'; //must grant write permission to the web app pro
  *
  * https://h5ptechnology.atlassian.net/browse/HFP-1202
  */
-class FsLibraryManagementStrategy extends AbstractLibraryManagementStrategy {
+class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
 
     /**
-     * Initializes the FsLibraryManagementStrategy
+     * Initializes the FsLibraryStorageStrategy
      * @param opts.basePath {string}: defines the base path to work with where h5p libraries, it is a sub-path of the app root.
      */
     constructor(opts){
         super();
         this._basePath = opts.basePath;
-
-        /**
-         * Local instance of FileSystemDAL
-         * who manages low level FS operations.
-         * @type {FileSystemDAL}
-         * @private
-         */
-        this._fsDAL = new FileSystemDAL();
     }
 
     /**
@@ -75,10 +67,10 @@ class FsLibraryManagementStrategy extends AbstractLibraryManagementStrategy {
         let libraryDestPath = this.getLibraryPath(libDef);
 
         // Make sure destination dir doesn't exist
-        await this._fsDAL.deepDelete(libraryDestPath);
+        await FileSystemDAL.deepDelete(libraryDestPath);
 
         // Move library folder
-        return await this._fsDAL.deepCopy(libraryUploadedInTemp, libraryDestPath);
+        return await FileSystemDAL.deepCopy(libraryUploadedInTemp, libraryDestPath,true);
     };
 
     /**
@@ -97,7 +89,7 @@ class FsLibraryManagementStrategy extends AbstractLibraryManagementStrategy {
         //puts the library name into the name of the target
         targetPath = path.join(targetPath, libDef.asString(true));
 
-        return await this._fsDAL.deepCopy(libraryPath,targetPath);
+        return await FileSystemDAL.deepCopy(libraryPath,targetPath,true);
     }
 
     //TODO: check https://h5ptechnology.slack.com/archives/C36BURHFH/p1497872148219359
@@ -111,13 +103,13 @@ class FsLibraryManagementStrategy extends AbstractLibraryManagementStrategy {
      * @returns {Promise.<boolean>} true when all path and childs are saved
      */
     async saveContent(sourcePath,contentID){
-        let destPath = FsLibraryManagementStrategy.getContentPath(contentID);
+        let destPath = FsLibraryStorageStrategy.getContentPath(contentID);
 
         // Make sure destination dir doesn't exist
-        await this._fsDAL.deepDelete(destPath);
+        await FileSystemDAL.deepDelete(destPath);
 
         // Move library folder
-        return await this._fsDAL.deepCopy(sourcePath, destPath);
+        return await FileSystemDAL.deepCopy(sourcePath, destPath,true);
     }
 
     /**
@@ -127,7 +119,7 @@ class FsLibraryManagementStrategy extends AbstractLibraryManagementStrategy {
      * @returns {Promise.<void>}
      */
     async deleteContent(contentID){
-        await this._fsDAL.deepDelete(FsLibraryManagementStrategy.getContentPath(contentID));
+        await FileSystemDAL.deepDelete(FsLibraryStorageStrategy.getContentPath(contentID));
     }
 
     /**
@@ -139,12 +131,12 @@ class FsLibraryManagementStrategy extends AbstractLibraryManagementStrategy {
      * @returns {Promise.<boolean>} true when content is fully cloned
      */
     async cloneContent(contentID, newContentID) {
-        let originalContentPath = FsLibraryManagementStrategy.getContentPath(contentID);
-        let clonedContentPath = FsLibraryManagementStrategy.getContentPath(newContentID);
+        let originalContentPath = FsLibraryStorageStrategy.getContentPath(contentID);
+        let clonedContentPath = FsLibraryStorageStrategy.getContentPath(newContentID);
 
         //makes sure the clone actually has all contents of the original
         //and returns the result
-        return await this._fsDAL.deepCopy(originalContentPath,clonedContentPath);
+        return await FileSystemDAL.deepCopy(originalContentPath,clonedContentPath,true);
     }
 
     /**
@@ -160,17 +152,15 @@ class FsLibraryManagementStrategy extends AbstractLibraryManagementStrategy {
      * or an empty path for it is available
      */
     async exportContent(contentID,targetPath){
-        let contentPath = FsLibraryManagementStrategy.getContentPath(contentID);
-        if(await this._fsDAL.resourceExists(contentPath))
-            return await this._fsDAL.deepCopy(contentPath,targetPath);
+        let contentPath = FsLibraryStorageStrategy.getContentPath(contentID);
+        if(await FileSystemDAL.resourceExists(contentPath))
+            return await FileSystemDAL.deepCopy(contentPath,targetPath,true);
         else{
-            await this._fsDAL.ensurePath(targetPath);
+            await FileSystemDAL.ensurePath(targetPath);
             return true;
         }
     };
 
-
-
 }
 
-module.exports = FsLibraryManagementStrategy;
+module.exports = FsLibraryStorageStrategy;
