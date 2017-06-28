@@ -2,7 +2,7 @@
  * Object describing the H5P library definition.
  * @link https://h5p.org/library-definition#libcoreApi
  */
-class LibraryDefinition {
+class H5PLibraryDefinition {
 
     constructor(){
         this.title = '';
@@ -44,4 +44,4 @@ class LibraryDefinition {
     }
 }
 
-module.exports = LibraryDefinition;
+module.exports = H5PLibraryDefinition;

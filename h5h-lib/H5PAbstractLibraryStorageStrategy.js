@@ -1,11 +1,11 @@
-const MESSAGE = 'Missing implementation of method AbstractLibraryStorageStrategy.';
+const MESSAGE = 'Missing implementation of method H5PAbstractLibraryStorageStrategy.';
 
 /**
  * This class defines an "interface"
  * to implement multiple storage
  * strategies.
  */
-class AbstractLibraryStorageStrategy {
+class H5PAbstractLibraryStorageStrategy {
 
     /**
      * Returns the path where h5p library
@@ -21,7 +21,7 @@ class AbstractLibraryStorageStrategy {
      * Async stores the h5p library folder
      * by selecting the library by the
      * provided versioning info.
-     * @param libDef {LibraryDefinition}
+     * @param libDef {H5PLibraryDefinition}
      * @returns {Promise.<boolean>}
      * true when there are not differences
      * from original library and the saved
@@ -73,7 +73,7 @@ class AbstractLibraryStorageStrategy {
 
     /**
      * Fetch library folder and save in target directory.
-     * @param libDef {LibraryDefinition} lib to be exported
+     * @param libDef {H5PLibraryDefinition} lib to be exported
      * @param targetPath {string} path where to export the library
      * @param [devPath] {string} replacement path where the lib resides (dev only)
      * @returns {Promise.<boolean>}
@@ -150,11 +150,11 @@ class AbstractLibraryStorageStrategy {
      * Gets the path of the given library
      * relative to the general libraries
      * store in the web app.
-     * @param libDef {LibraryDefinition}
+     * @param libDef {H5PLibraryDefinition}
      * @return {string}
      */
     getLibraryPath(libDef) {throw MESSAGE+'getLibraryPath().';}
 
 }
 
-module.exports = AbstractLibraryStorageStrategy;
+module.exports = H5PAbstractLibraryStorageStrategy;

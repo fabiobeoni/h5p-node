@@ -8,6 +8,8 @@ const recursiveRead = require('fs-readdir-recursive');
 const TEMP_PATH = 'temp-res'; //must grant write permission to the web app process.
 const PATH_PREFIX = 'h5p-';
 
+const DEFAULT_ENCODING = 'utf-8';
+
 /**
  * This class act as default storage
  * system for the web-app working
@@ -31,6 +33,20 @@ class FileSystemDAL {
     static async resourceExists(pathTo){
         pathTo = path.resolve(pathTo);
         return await fsx.pathExists(pathTo);
+    };
+
+    /**
+     * Reads the content of the given
+     * resource as text and returns it.
+     * @param pathTo {string}
+     * @param [encoding] {string} default is UTF-8
+     * @return {Promise.<string>}
+     */
+    static async readResourceAsText(pathTo,encoding){
+        pathTo = path.resolve(pathTo);
+        encoding = encoding || DEFAULT_ENCODING;
+
+        return await fsx.readFile(pathTo,encoding);
     };
 
     /**
@@ -229,6 +245,12 @@ class FileSystemDAL {
             ignoreOpts:ignoreOpts
         };
     }
+
+    /**
+     * Gets the node "path" module.
+     * @type {path}
+     */
+    static getPath(){ return path; }
 
 }
 

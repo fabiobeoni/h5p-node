@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JavaScript-modules-diagram</ID>
+  <OriginalElement>/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PAbstractLibraryStorageStrategy.js;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryDefaultStorageStrategy.js;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryDefinition.js;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryManager.js;</OriginalElement>
+  <nodes>
+    <node x="70.74782060707912" y="345.46738787942445">/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#dirCompare#95;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#fsx#6;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#os#69;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#path#39;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#recursiveRead#173;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#uuidV4#138;</node>
+    <node x="1011.3557399432832" y="338.76126457304906">/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PAbstractLibraryStorageStrategy.js</node>
+    <node x="467.71956727234533" y="341.6745089801491">/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryDefaultStorageStrategy.js#FileSystemDAL#96;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryDefaultStorageStrategy.js#H5PAbstractLibraryStorageStrategy#6;</node>
+    <node x="1618.396071841193" y="340.22056506669463">/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryManager.js#H5PAbstractLibraryStorageStrategy#6;</node>
+    <node x="293.21856947799597" y="539.761264573049">/home/fabio/Dropbox/Code/h5p-node/node_modules/fs-extra/lib/index.js</node>
+    <node x="-248.73637222980776" y="458.37391030353956">/home/fabio/Dropbox/Code/h5p-node/node_modules/dir-compare/index.js</node>
+    <node x="-159.25217939292088" y="175.46738787942445">/home/fabio/Dropbox/Code/h5p-node/node_modules/fs-readdir-recursive/index.js</node>
+    <node x="133.74782060707912" y="60.46738787942445">/home/fabio/.WebStorm2017.1/config/javascript/nodejs/4.5.0/core-modules/os.js</node>
+    <node x="138.26362777019224" y="622.3739103035396">/home/fabio/.WebStorm2017.1/config/javascript/nodejs/4.5.0/core-modules/path.js</node>
+    <node x="-57.736372229807756" y="600.3739103035396">/home/fabio/Dropbox/Code/h5p-node/node_modules/uuid/v4.js</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryDefaultStorageStrategy.js#FileSystemDAL#96;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryDefaultStorageStrategy.js#H5PAbstractLibraryStorageStrategy#6;" target="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#dirCompare#95;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#fsx#6;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#os#69;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#path#39;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#recursiveRead#173;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#uuidV4#138;">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryDefaultStorageStrategy.js#FileSystemDAL#96;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryDefaultStorageStrategy.js#H5PAbstractLibraryStorageStrategy#6;" target="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PAbstractLibraryStorageStrategy.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#dirCompare#95;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#fsx#6;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#os#69;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#path#39;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#recursiveRead#173;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#uuidV4#138;" target="/home/fabio/Dropbox/Code/h5p-node/node_modules/uuid/v4.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#dirCompare#95;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#fsx#6;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#os#69;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#path#39;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#recursiveRead#173;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#uuidV4#138;" target="/home/fabio/.WebStorm2017.1/config/javascript/nodejs/4.5.0/core-modules/os.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#dirCompare#95;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#fsx#6;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#os#69;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#path#39;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#recursiveRead#173;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#uuidV4#138;" target="/home/fabio/Dropbox/Code/h5p-node/node_modules/dir-compare/index.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#dirCompare#95;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#fsx#6;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#os#69;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#path#39;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#recursiveRead#173;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#uuidV4#138;" target="/home/fabio/.WebStorm2017.1/config/javascript/nodejs/4.5.0/core-modules/path.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PLibraryManager.js#H5PAbstractLibraryStorageStrategy#6;" target="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/H5PAbstractLibraryStorageStrategy.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#dirCompare#95;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#fsx#6;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#os#69;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#path#39;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#recursiveRead#173;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#uuidV4#138;" target="/home/fabio/Dropbox/Code/h5p-node/node_modules/fs-readdir-recursive/index.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#dirCompare#95;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#fsx#6;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#os#69;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#path#39;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#recursiveRead#173;/home/fabio/Dropbox/Code/h5p-node/h5h-lib/FileSystemDAL.js#uuidV4#138;" target="/home/fabio/Dropbox/Code/h5p-node/node_modules/fs-extra/lib/index.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.5525827045850262" x="946.0" y="364.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>All</Category>
+  </Categories>
+  <VISIBILITY>Overview</VISIBILITY>
+</Diagram>
+

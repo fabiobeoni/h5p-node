@@ -19,20 +19,20 @@ describe('H5P Libraries Management:', ()=> {
         let isFullyStored = false;
 
         try{
-            let fsMngStrat = new H5PLib.FsLibraryStorageStrategy({
+            let storageStrat = new H5PLib.H5PLibraryDefaultStorageStrategy({
                 basePath:'./h5p-packages'
             });
 
-            let libMng = new H5PLib.LibraryManager(fsMngStrat);
+            let libMng = new H5PLib.H5PLibraryManager(storageStrat);
 
-            let libraryDef = new H5PLib.LibraryDefinition();
+            let libraryDef = new H5PLib.H5PLibraryDefinition();
             libraryDef.majorVersion = 1;
             libraryDef.minorVersion =0;
             libraryDef.machineName = 'MyLib';
             libraryDef.name = 'mylib';
             libraryDef.uploadDirectory = TestVars.SAMPLE_LIBRARY_PATH;
 
-            isFullyStored = await libMng.saveLibrary(libraryDef);
+            isFullyStored = await libMng.getStorage().saveLibrary(libraryDef);
         }
         catch (err){
             console.error(err);

@@ -1,6 +1,4 @@
-const path = require('path');
-
-const AbstractLibraryStorageStrategy = require('./AbstractLibraryStorageStrategy');
+const H5PAbstractLibraryStorageStrategy = require('./H5PAbstractLibraryStorageStrategy');
 const FileSystemDAL = require('./FileSystemDAL');
 
 const LIBRARIES_PATH = 'libraries';
@@ -24,10 +22,10 @@ const CSS_EXT = '.css';
  *
  * https://h5ptechnology.atlassian.net/browse/HFP-1202
  */
-class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
+class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy {
 
     /**
-     * Initializes the FsLibraryStorageStrategy
+     * Initializes the H5PLibraryDefaultStorageStrategy
      * @param opts.basePath {string}:
      * defines the base path to work with
      * where h5p files, it is a sub-path
@@ -41,10 +39,10 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
 
         //creates all needed sub paths to work with...
         Promise.all([
-            FileSystemDAL.ensurePath(path.join(this._basePath,LIBRARIES_PATH)),
-            FileSystemDAL.ensurePath(path.join(this._basePath,EXPORTS_PATH)),
-            FileSystemDAL.ensurePath(path.join(this._basePath,CONTENT_PATH)),
-            FileSystemDAL.ensurePath(path.join(this._basePath,CACHED_ASSETS_PATH))
+            FileSystemDAL.ensurePath(FileSystemDAL.getPath().join(this._basePath,LIBRARIES_PATH)),
+            FileSystemDAL.ensurePath(FileSystemDAL.getPath().join(this._basePath,EXPORTS_PATH)),
+            FileSystemDAL.ensurePath(FileSystemDAL.getPath().join(this._basePath,CONTENT_PATH)),
+            FileSystemDAL.ensurePath(FileSystemDAL.getPath().join(this._basePath,CACHED_ASSETS_PATH))
         ])
             .then(console.log('H5P required paths created'))
             .catch(err=>console.error(err));
@@ -57,25 +55,25 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * @param contentID {string}
      */
     getContentPath(contentID) {
-        return path.join(this._basePath, CONTENT_PATH, contentID);
+        return FileSystemDAL.getPath().join(this._basePath, CONTENT_PATH, contentID);
     }
 
     /**
      * Gets the path of the given library
      * relative to the general libraries
      * store in the web app.
-     * @param libDef {LibraryDefinition}
+     * @param libDef {H5PLibraryDefinition}
      * @return {string}
      */
     getLibraryPath(libDef) {
-        return path.join(this._basePath, LIBRARIES_PATH, libDef.asString(true));
+        return FileSystemDAL.getPath().join(this._basePath, LIBRARIES_PATH, libDef.asString(true));
     }
 
     /**
      * Async stores the h5p library folder
      * by selecting the library by the
      * provided versioning info.
-     * @param libDef {LibraryDefinition}
+     * @param libDef {H5PLibraryDefinition}
      * @returns {Promise.<boolean>}
      * true when there are not differences
      * from original library and the saved
@@ -83,7 +81,7 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      */
     async saveLibrary(libDef) {
 
-        let libraryUploadedInTemp = path.join(libDef.uploadDirectory,libDef.asString(true));
+        let libraryUploadedInTemp = FileSystemDAL.getPath().join(libDef.uploadDirectory,libDef.asString(true));
         let libraryDestPath = this.getLibraryPath(libDef);
 
         // Make sure destination dir doesn't exist
@@ -97,7 +95,7 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * Fetch library from the given path and
      * copies it in target path ready for exporting.
      *
-     * @param libDef {LibraryDefinition} lib to be exported
+     * @param libDef {H5PLibraryDefinition} lib to be exported
      * @param targetPath {string} path where to export the library
      * (must not include the lib name, will be added).
      * @param [devPath] {string} replacement path where the lib resides (dev only)
@@ -107,7 +105,7 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
         let libraryPath = devPath || this.getLibraryPath(libDef);
 
         //puts the library name into the name of the target
-        targetPath = path.join(targetPath, libDef.asString(true));
+        targetPath = FileSystemDAL.getPath().join(targetPath, libDef.asString(true));
 
         return await FileSystemDAL.deepCopy(libraryPath,targetPath,true);
     }
@@ -123,7 +121,7 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * @returns {Promise.<boolean>} true when all path and childs are saved
      */
     async saveContent(sourcePath,contentID){
-        let destPath = FsLibraryStorageStrategy.getContentPath(contentID);
+        let destPath = H5PLibraryDefaultStorageStrategy.getContentPath(contentID);
 
         // Make sure destination dir doesn't exist
         await FileSystemDAL.deepDelete(destPath);
@@ -139,7 +137,7 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * @returns {Promise.<void>}
      */
     async deleteContent(contentID){
-        await FileSystemDAL.deepDelete(FsLibraryStorageStrategy.getContentPath(contentID));
+        await FileSystemDAL.deepDelete(H5PLibraryDefaultStorageStrategy.getContentPath(contentID));
     }
 
     /**
@@ -151,8 +149,8 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * @returns {Promise.<boolean>} true when content is fully cloned
      */
     async cloneContent(contentID, newContentID) {
-        let originalContentPath = FsLibraryStorageStrategy.getContentPath(contentID);
-        let clonedContentPath = FsLibraryStorageStrategy.getContentPath(newContentID);
+        let originalContentPath = H5PLibraryDefaultStorageStrategy.getContentPath(contentID);
+        let clonedContentPath = H5PLibraryDefaultStorageStrategy.getContentPath(newContentID);
 
         //makes sure the clone actually has all contents of the original
         //and returns the result
@@ -172,7 +170,7 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * or an empty path for it is available
      */
     async exportContent(contentID,targetPath){
-        let contentPath = FsLibraryStorageStrategy.getContentPath(contentID);
+        let contentPath = H5PLibraryDefaultStorageStrategy.getContentPath(contentID);
         if(await FileSystemDAL.resourceExists(contentPath))
             return await FileSystemDAL.deepCopy(contentPath,targetPath,true);
         else{
@@ -194,8 +192,8 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
 
         //performs the copy
         return await FileSystemDAL.deepCopy(
-            path.join(EXPORTS_PATH,sourceExportName),
-            path.join(EXPORTS_PATH,outputExportName),
+            FileSystemDAL.getPath().join(EXPORTS_PATH,sourceExportName),
+            FileSystemDAL.getPath().join(EXPORTS_PATH,outputExportName),
             false
         );
     }
@@ -207,7 +205,7 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * @return {Promise.<void>}
      */
     async deleteExport(exportName){
-        await FileSystemDAL.deepDelete(path.join(EXPORTS_PATH,exportName));
+        await FileSystemDAL.deepDelete(FileSystemDAL.getPath().join(EXPORTS_PATH,exportName));
     }
 
     /**
@@ -218,20 +216,17 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * @return {Promise.<boolean>}
      */
     async exportExists(exportName){
-        await FileSystemDAL.resourceExists(path.join(EXPORTS_PATH,exportName));
+        await FileSystemDAL.resourceExists(FileSystemDAL.getPath().join(EXPORTS_PATH,exportName));
     };
 
     /**
      * Concatenates all JavaScrips and Stylesheets into two files in order
      * to improve page load performance.
-     * @param files {string[]} a set of all the assets required for content to display
+     * @param assets {object} a set of all the assets required for content to display
      * @param key {string} hashed key for the cached asset
      * @return {Promise.<void>}
      */
-    async cacheAssets(files,key){
-        //code is not really clear to me, asked question on slack
-        //https://h5ptechnology.slack.com/archives/C36BURHFH/p1498053590297468
-
+    async cacheAssets(assets,key){
         //According to Joubel (https://h5ptechnology.slack.com/archives/C36BURHFH/p1498053967451612)
         //"files" input should be:
         /*
@@ -239,7 +234,52 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
          scripts: [{path: '', version: ''},{path: '', version: ''}]
          styles: [{path: '', version: ''},{path: '', version: ''}]
          }
+
         * */
+        let content = '';
+
+        assets.forEach(async(asset,i)=>{
+
+            //scripts or styles list of files
+            if(asset && asset.length>0)//has an array of child objects
+            {
+                //get the file path
+                let assetPath = FileSystemDAL.getPath().join(this._basePath,asset.path);
+
+                //check if it exists
+                if(await FileSystemDAL.resourceExists(assetPath)){
+                    //get the content of the file as string
+                    let assetContent = await FileSystemDAL.readResourceAsText(assetPath);
+
+                    //script file content added to the existing
+                    //string so you gonna have only one script
+                    //to include in HTML.
+                    if(assets[i]==='scripts')
+                        content += assetContent;
+                    else {
+
+                        let cssRelativePath = asset.path.replace('/[^\/]+$/','');
+
+                        /*
+                        TODO: discuss with Joubel, this code is out of my small knowledge of PHP. Moreover looks a bit sensitive...
+
+                         // Rewrite relative URLs used inside stylesheets
+                         $content .= preg_replace_callback(
+                         '/url\([\'"]?([^"\')]+)[\'"]?\)/i',
+                         function ($matches) use ($cssRelPath) {
+                            if (preg_match("/^(data:|([a-z0-9]+:)?\/)/i", $matches[1]) === 1) {
+                                return $matches[0]; // Not relative, skip
+                            }
+                            return 'url("../' . $cssRelPath . $matches[1] . '")';
+                         },
+                         $assetContent) . "\n";
+                        */
+                    }
+                }
+                else
+                    console.warn(`The file "${asset.path}" passed to "cacheAssets()" doesn't exist.`);
+            }
+        });
     }
 
     /**
@@ -291,7 +331,7 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * @return {Promise.<string>}
      */
     async getWritableTempPath(){
-        return await FsLibraryStorageStrategy.getWritableTempPath(this._basePath);
+        return await H5PLibraryDefaultStorageStrategy.getWritableTempPath(this._basePath);
     }
 
     /**
@@ -303,10 +343,10 @@ class FsLibraryStorageStrategy extends AbstractLibraryStorageStrategy {
      * @param ext {string} ".js", ".css"
      * @return {string}
      */
-    getCachedAssetsSrc(key,ext){
+    static getCachedAssetsSrc(key,ext){
         return (CACHED_ASSETS_PATH+`${key}.${ext}`);
     }
 
 }
 
-module.exports = FsLibraryStorageStrategy;
+module.exports = H5PLibraryDefaultStorageStrategy;
