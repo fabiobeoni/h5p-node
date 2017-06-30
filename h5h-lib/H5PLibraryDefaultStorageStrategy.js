@@ -5,10 +5,13 @@ const LIBRARIES_PATH = 'libraries';
 const CONTENT_PATH = 'content';
 const EXPORTS_PATH = 'exports';
 const CACHED_ASSETS_PATH = '/cachedassets/';
+const EDITOR_PATH = 'editor';
 
-const JS_EXT = '.js';
-const CSS_EXT = '.css';
+const JS_EXT = 'js';
+const CSS_EXT = 'css';
 
+
+//TODO: check all methods and make sure they all returns a value to let the client know about the completion of the invocation (no Promise<void> at-all!), and log errors.
 
 /**
  * This class act as default storage
@@ -26,16 +29,23 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
 
     /**
      * Initializes the H5PLibraryDefaultStorageStrategy
-     * @param opts.basePath {string}:
-     * defines the base path to work with
-     * where h5p files, it is a sub-path
-     * of the app root.
-     * NOTE: Web app process must have write
-     * permission to it.
+     * @param opts {object}:
+     *
+     *      basePath {string}:
+     *          defines the base path to work with
+     *          where h5p files, it is a sub-path
+     *          of the app root.
+     *          NOTE: Web app process must have write
+     *          permission to it.
+     *
+     *      [altEditorPath] {string}:
+     *          defines an alternative path for
+     *          the editor.
      */
     constructor(opts){
         super();
         this._basePath = opts.basePath;
+        this._altEditorPath = opts.altEditorPath; //optional
 
         //creates all needed sub paths to work with...
         Promise.all([
@@ -323,6 +333,137 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
     }
 
     /**
+     * Deletes all given assets list from the cache.
+     * @param keys {string[]}: list of keys
+     * @return {Promise.<void>}
+     */
+    async deleteCachedAssets(keys){
+        for(let key of keys)
+            for(let ext of [JS_EXT,CSS_EXT])
+            {
+                let assetPath = this.getCachedAssetsSrc(key,ext);
+                if(await FileSystemDAL.resourceExists(assetPath))
+                    await FileSystemDAL.deepDelete(assetPath);
+            }
+    }
+
+    /**
+     * Reads the given path and returns
+     * the resource content as a text string (UTF-8).
+     * In this storage strategy implementation,
+     * it's just a wrapper a-round the
+     * FileSystemDAL.readResourceAsText, and
+     * exposed as required by the abstract
+     * parent class.
+     * @param path {string}
+     * @param [encoding] {string}
+     * @return {Promise.<string>}
+     */
+    async getResourceAsText(path,encoding){
+        return await FileSystemDAL.readResourceAsText(path,encoding);
+    }
+
+    /**
+     * Save files uploaded through the editor.
+     * The files must be marked as temporary until the content form is saved.
+     * @param editorFile {H5PEditorFile}
+     * @param contentID {string}
+     * @return {Promise.<void>}
+     */
+    async saveResource(editorFile,contentID){
+        let storingPath = '';
+
+        if(contentID.trim().length===0)
+            storingPath = this.getEditorPath();
+        else
+            storingPath = this.getContentPath(contentID);
+
+        //appends to editor working path + 's' //TODO: what's that "s" (from PHP code)?
+        storingPath = FileSystemDAL.getPath().join(storingPath,editorFile.type,'s');
+
+        await FileSystemDAL.ensurePath(storingPath);
+
+        //now also adds the name of the file
+        storingPath = FileSystemDAL.getPath().join(storingPath,editorFile.name);
+
+        let fileContent = editorFile.getData();
+        if(fileContent)
+            await FileSystemDAL.writeResource(storingPath,fileContent);
+        else{
+            //TODO: PHP copy($_FILES['file']['tmp_name'], $path);
+            /*
+            * here the php code automatically access a global
+            * var in the request $_FILES providing the list
+            * of files uploaded from a POST request.
+            *
+            * Let's see how to implement this in nodejs
+            * */
+        }
+    }
+
+    /**
+     * Looks for the given resource item with-in
+     * the content path, and returns the full path
+     * of it when available
+     * @param resourceItemPath {string}: path relative to contentID path
+     * @param contentID {string}
+     * @return {Promise.<string>}: null is resource doesn't exist
+     */
+    async getFullResourceItemPathFromContent(resourceItemPath, contentID){
+        let fullResPath = FileSystemDAL.getPath().join(this.getContentPath(contentID), resourceItemPath);
+        return (await FileSystemDAL.resourceExists(fullResPath)) ? fullResPath : null;
+    }
+
+    /**
+     * Looks for the given resource item with-in
+     * the content path and deletes it if any.
+     * @param resourceItemPath {string}: path relative to contentID path
+     * @param contentID {string}
+     * @return {Promise.<void>}
+     */
+    async deleteResourceItemFromContent(resourceItemPath, contentID){
+        let fullResPath = await this.getFullResourceItemPathFromContent(resourceItemPath,contentID);
+        if(fullResPath)
+            await FileSystemDAL.deleteResource(fullResPath);
+    }
+
+    /**
+     * Copy a file from another content or editor tmp path
+     * to the provided destination contentID.
+     *
+     * @param resourceItemPath {string}: path relative to contentID path
+     * @param fromContentID {string}
+     * @param toContentID {string}
+     */
+    async cloneContentResourceItem(resourceItemPath, fromContentID, toContentID) {
+
+        //gets the location of the content
+        //resource to clone, it can be
+        //hosted on editor working path
+        //or into a specific content path
+        let sourceLocation = '';
+
+        if(fromContentID==='editor')
+            sourceLocation = this.getEditorPath();
+        else
+            sourceLocation = this.getContentPath(fromContentID);
+
+        //that's the full original path
+        let fullSourceResourceItemPath = FileSystemDAL.getPath().join(sourceLocation, resourceItemPath);
+
+        //that's the full destination, where the content resource item will be cloned
+        let destinationLocation = this.getContentPath(toContentID);
+        let fullDestinationResourceItemPath = fullSourceResourceItemPath.replace(sourceLocation,destinationLocation);
+
+        //clones only if the file doesn't exist (from PHP, looks like updates is not possible then)
+        if(await FileSystemDAL.resourceExists(fullDestinationResourceItemPath)===false)
+            await FileSystemDAL.copyResource(
+                fullSourceResourceItemPath,
+                fullDestinationResourceItemPath
+            );
+    }
+
+    /**
      * Returns a temp dir with unique name.
      * Not sure that is really needed in
      * nodejs.
@@ -331,7 +472,26 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @return {Promise.<string>}
      */
     async getWritableTempPath(){
-        return await H5PLibraryDefaultStorageStrategy.getWritableTempPath(this._basePath);
+        return await FileSystemDAL.getWritableTempPath(this._basePath);
+    }
+
+    /**
+     * Returns true if the given path
+     * has writable access.
+     * @param pathTo {string}
+     * @return {Promise.<boolean>}
+     */
+    async isPathWritable(pathTo){
+        return await FileSystemDAL.isPathWritable(pathTo);
+    }
+
+    /**
+     * Returns the path where the editor
+     * is working on.
+     * @return {string}
+     */
+    getEditorPath(){
+        return this._altEditorPath || FileSystemDAL.getPath().join(this._basePath,EDITOR_PATH);
     }
 
     /**

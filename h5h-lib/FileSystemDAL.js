@@ -50,8 +50,22 @@ class FileSystemDAL {
     };
 
     /**
+     * Writes the given content to
+     * the the provided file path.
+     * @param pathTo {string}
+     * @param content {string}
+     * @param [encoding] {string}
+     * @return {Promise.<*>}
+     */
+    static async writeResource(pathTo,content,encoding){
+        pathTo = path.resolve(pathTo);
+        encoding = encoding || DEFAULT_ENCODING;
+        return await fsx.writeFile(pathTo,content,encoding);
+    }
+
+    /**
      * Async and recursively deletes a tree, if any.
-     * @param path {string}
+     * @param pathTo {string}
      * @returns {Promise.<void>}
      * @php H5PCore deleteFileTree
      */
@@ -114,6 +128,28 @@ class FileSystemDAL {
 
         return completed;
     };
+
+    /**
+     * Copy a file from path to path.
+     * @param from {string}
+     * @param to {string}
+     * @return {Promise.<void>}
+     */
+    static async copyResource(from, to){
+        let absFrom = path.resolve(from);
+        let absTo = path.resolve(to);
+        await fsx.copy(absFrom,absTo);
+    }
+
+    /**
+     * Deletes the given single resource
+     * at the given path.
+     * @param pathTo {string}: path to the resource to delete
+     * @return {Promise.<void>}
+     */
+    static async deleteResource(pathTo){
+        await fsx.remove(path.resolve(pathTo));
+    }
 
     /**
      * Makes sure you get the path
@@ -244,6 +280,22 @@ class FileSystemDAL {
             allowedList:allowedList,
             ignoreOpts:ignoreOpts
         };
+    }
+
+    /**
+     * Returns true if the given path
+     * has writable access.
+     * @param pathTo {string}
+     * @return {boolean}
+     */
+    static async isPathWritable(pathTo){
+        try{
+            await fsx.access(path.resolve(pathTo), fsx.W_OK);
+            return true;
+        }
+        catch (err){
+            return false;
+        }
     }
 
     /**

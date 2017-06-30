@@ -137,6 +137,59 @@ class H5PAbstractLibraryStorageStrategy {
     async getCachedAssets(key){throw MESSAGE+'getCachedAssets()';}
 
     /**
+     * Deletes all given assets list from the cache.
+     * @param keys {string[]}: list of keys
+     * @return {Promise.<void>}
+     */
+    async deleteCachedAssets(keys){ throw MESSAGE+'deleteCachedAssets().';}
+
+    /**
+     * Reads the given path and returns
+     * the resource content as a text string (UTF-8).
+     * @param path {string}
+     * @param [encoding] {string}
+     * @return {Promise.<string>}
+     */
+    async getResourceAsText(path,encoding){ throw MESSAGE+'getResourceAsText().';}
+
+    /**
+     * Save files uploaded through the editor.
+     * The files must be marked as temporary until the content form is saved.
+     * @param editorFile {H5PEditorFile}
+     * @param contentID {string}
+     * @return {Promise.<void>}
+     */
+    async saveResource(editorFile,contentID){throw MESSAGE+'saveResource().';}
+
+    /**
+     * Looks for the given resource item with-in
+     * the content path, and returns the full path
+     * of it when available
+     * @param resourceItemPath {string}: path relative to contentID path
+     * @param contentID {string}
+     * @return {Promise.<string>}: null is resource doesn't exist
+     */
+    async getFullResourceItemPathFromContent(resourceItemPath, contentID){throw MESSAGE+'getFullResourceItemPathFromContent().';}
+
+    /**
+     * Looks for the given resource item with-in
+     * the content path and deletes it if any.
+     * @param resourceItemPath {string}: path relative to contentID path
+     * @param contentID {string}
+     * @return {Promise.<void>}
+     */
+    async deleteResourceItemFromContent(resourceItemPath, contentID){throw MESSAGE+'deleteResourceItemFromContent().';}
+
+    /**
+     * Copy a file from another content or editor tmp dir.
+     *
+     * @param resourceItemPath {string}: path relative to contentID path
+     * @param fromContentID {string}
+     * @param toContentID {string}
+     */
+    async cloneContentResourceItem(resourceItemPath, fromContentID, toContentID) {throw MESSAGE+'cloneContentResourceItem().';}
+
+    /**
      * Returns a temp dir with unique name.
      * Not sure that is really needed in
      * nodejs.
@@ -145,6 +198,14 @@ class H5PAbstractLibraryStorageStrategy {
      * @return {Promise.<string>}
      */
     async getWritableTempPath(){throw MESSAGE+'getWritableTempPath().';}
+
+    /**
+     * Returns true if the given path
+     * has writable access.
+     * @param pathTo {string}
+     * @return {Promise.<boolean>}
+     */
+    async isPathWritable(pathTo){throw MESSAGE+'isPathWritable().';}
 
     /**
      * Gets the path of the given library
