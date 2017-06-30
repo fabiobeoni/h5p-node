@@ -11,8 +11,6 @@ const JS_EXT = 'js';
 const CSS_EXT = 'css';
 
 
-//TODO: check all methods and make sure they all returns a value to let the client know about the completion of the invocation (no Promise<void> at-all!), and log errors.
-
 /**
  * This class act as default storage
  * system for the web-app working
@@ -90,7 +88,6 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * one in the new location
      */
     async saveLibrary(libDef) {
-
         let libraryUploadedInTemp = FileSystemDAL.getPath().join(libDef.uploadDirectory,libDef.asString(true));
         let libraryDestPath = this.getLibraryPath(libDef);
 
@@ -131,7 +128,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @returns {Promise.<boolean>} true when all path and childs are saved
      */
     async saveContent(sourcePath,contentID){
-        let destPath = H5PLibraryDefaultStorageStrategy.getContentPath(contentID);
+        let destPath = this.getContentPath(contentID);
 
         // Make sure destination dir doesn't exist
         await FileSystemDAL.deepDelete(destPath);
@@ -147,7 +144,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @returns {Promise.<void>}
      */
     async deleteContent(contentID){
-        await FileSystemDAL.deepDelete(H5PLibraryDefaultStorageStrategy.getContentPath(contentID));
+        await FileSystemDAL.deepDelete(this.getContentPath(contentID));
     }
 
     /**
@@ -159,8 +156,8 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @returns {Promise.<boolean>} true when content is fully cloned
      */
     async cloneContent(contentID, newContentID) {
-        let originalContentPath = H5PLibraryDefaultStorageStrategy.getContentPath(contentID);
-        let clonedContentPath = H5PLibraryDefaultStorageStrategy.getContentPath(newContentID);
+        let originalContentPath = this.getContentPath(contentID);
+        let clonedContentPath = this.getContentPath(newContentID);
 
         //makes sure the clone actually has all contents of the original
         //and returns the result
@@ -180,7 +177,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * or an empty path for it is available
      */
     async exportContent(contentID,targetPath){
-        let contentPath = H5PLibraryDefaultStorageStrategy.getContentPath(contentID);
+        let contentPath = this.getContentPath(contentID);
         if(await FileSystemDAL.resourceExists(contentPath))
             return await FileSystemDAL.deepCopy(contentPath,targetPath,true);
         else{
