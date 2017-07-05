@@ -12,9 +12,10 @@ const TestVars = require('./SharedTestVars');
 
 
 
-describe('H5P Libraries Management:', ()=> {
+describe('H5P Libraries Management:', async()=> {
 
     //Requires writable folder
+    /**/
     it('Saves h5p package from upload folder to libraries repository', async ()=> {
         let isFullyStored = false;
 
@@ -39,5 +40,34 @@ describe('H5P Libraries Management:', ()=> {
         }
 
         assert.equal(isFullyStored,true);
+    });
+
+
+    it('cacheAssets(): Get a list of files to merge and put in a cache', async()=>{
+
+        const CACHING_TEST_PATH = 'CachingAssetsTest';
+        const path = H5PLib.FileSystemDAL.getPath();
+
+        var data = {
+            scripts: [
+                {path:path.join(CACHING_TEST_PATH,'fileOne.js'), version: '1'},
+                {path:path.join(CACHING_TEST_PATH,'fileTwo.js'), version: '1'}
+            ],
+            styles: [
+                {path:path.join(CACHING_TEST_PATH,'fileThree.css'), version: '1'},
+                {path:path.join(CACHING_TEST_PATH,'fileFour.css'), version: '1'}
+            ]
+        }
+
+
+        let storageStrat = new H5PLib.H5PLibraryDefaultStorageStrategy({
+            basePath:TestVars.DATA_PATH
+        });
+
+        let merge = await storageStrat.cacheAssets(data,'my-key');
+
+        let hasResult = (merge!==null);
+
+        assert.equal(hasResult,true);
     });
 });

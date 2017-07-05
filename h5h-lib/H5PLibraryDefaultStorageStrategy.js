@@ -1,5 +1,4 @@
-const H5PAbstractLibraryStorageStrategy = require('./H5PAbstractLibraryStorageStrategy');
-const FileSystemDAL = require('./FileSystemDAL');
+require('./H5PSharedConstants');
 
 const LIBRARIES_PATH = 'libraries';
 const CONTENT_PATH = 'content';
@@ -7,8 +6,9 @@ const EXPORTS_PATH = 'exports';
 const CACHED_ASSETS_PATH = '/cachedassets/';
 const EDITOR_PATH = 'editor';
 
-const JS_EXT = 'js';
-const CSS_EXT = 'css';
+const H5PAbstractLibraryStorageStrategy = require('./H5PAbstractLibraryStorageStrategy');
+const FileSystemDAL = require('./FileSystemDAL');
+const join = FileSystemDAL.getPath().join;
 
 
 /**
@@ -47,10 +47,10 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
 
         //creates all needed sub paths to work with...
         Promise.all([
-            FileSystemDAL.ensurePath(FileSystemDAL.getPath().join(this._basePath,LIBRARIES_PATH)),
-            FileSystemDAL.ensurePath(FileSystemDAL.getPath().join(this._basePath,EXPORTS_PATH)),
-            FileSystemDAL.ensurePath(FileSystemDAL.getPath().join(this._basePath,CONTENT_PATH)),
-            FileSystemDAL.ensurePath(FileSystemDAL.getPath().join(this._basePath,CACHED_ASSETS_PATH))
+            FileSystemDAL.ensurePath(join(this._basePath,LIBRARIES_PATH)),
+            FileSystemDAL.ensurePath(join(this._basePath,EXPORTS_PATH)),
+            FileSystemDAL.ensurePath(join(this._basePath,CONTENT_PATH)),
+            FileSystemDAL.ensurePath(join(this._basePath,CACHED_ASSETS_PATH))
         ])
             .then(console.log('H5P required paths created'))
             .catch(err=>console.error(err));
@@ -63,7 +63,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @param contentID {string}
      */
     getContentPath(contentID) {
-        return FileSystemDAL.getPath().join(this._basePath, CONTENT_PATH, contentID);
+        return join(this._basePath, CONTENT_PATH, contentID);
     }
 
     /**
@@ -74,7 +74,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @return {string}
      */
     getLibraryPath(libDef) {
-        return FileSystemDAL.getPath().join(this._basePath, LIBRARIES_PATH, libDef.asString(true));
+        return join(this._basePath, LIBRARIES_PATH, libDef.asString(true));
     }
 
     /**
@@ -88,7 +88,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * one in the new location
      */
     async saveLibrary(libDef) {
-        let libraryUploadedInTemp = FileSystemDAL.getPath().join(libDef.uploadDirectory,libDef.asString(true));
+        let libraryUploadedInTemp = join(libDef.uploadDirectory,libDef.asString(true));
         let libraryDestPath = this.getLibraryPath(libDef);
 
         // Make sure destination dir doesn't exist
@@ -112,7 +112,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
         let libraryPath = devPath || this.getLibraryPath(libDef);
 
         //puts the library name into the name of the target
-        targetPath = FileSystemDAL.getPath().join(targetPath, libDef.asString(true));
+        targetPath = join(targetPath, libDef.asString(true));
 
         return await FileSystemDAL.deepCopy(libraryPath,targetPath,true);
     }
@@ -199,8 +199,8 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
 
         //performs the copy
         return await FileSystemDAL.deepCopy(
-            FileSystemDAL.getPath().join(EXPORTS_PATH,sourceExportName),
-            FileSystemDAL.getPath().join(EXPORTS_PATH,outputExportName),
+            join(EXPORTS_PATH,sourceExportName),
+            join(EXPORTS_PATH,outputExportName),
             false
         );
     }
@@ -212,7 +212,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @return {Promise.<void>}
      */
     async deleteExport(exportName){
-        await FileSystemDAL.deepDelete(FileSystemDAL.getPath().join(EXPORTS_PATH,exportName));
+        await FileSystemDAL.deepDelete(join(EXPORTS_PATH,exportName));
     }
 
     /**
@@ -223,70 +223,94 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @return {Promise.<boolean>}
      */
     async exportExists(exportName){
-        await FileSystemDAL.resourceExists(FileSystemDAL.getPath().join(EXPORTS_PATH,exportName));
+        await FileSystemDAL.resourceExists(join(EXPORTS_PATH,exportName));
     };
 
     /**
      * Concatenates all JavaScrips and Stylesheets into two files in order
      * to improve page load performance.
-     * @param assets {object} a set of all the assets required for content to display
+     *
+     * According to Joubel (https://h5ptechnology.slack.com/archives/C36BURHFH/p1498053967451612)
+       "files" input should be:
+      {
+        scripts: [{path: 'path/to/file', version: 'something'}]
+        styles: [{path: 'path/to/file', version: 'something'}]
+      }
+     * @param files {object} a set of all the assets required for content to display
      * @param key {string} hashed key for the cached asset
-     * @return {Promise.<void>}
+     * @return {Promise.<object>} returns the same object of the input but with only one file per type and with abs path to it.
      */
-    async cacheAssets(assets,key){
-        //According to Joubel (https://h5ptechnology.slack.com/archives/C36BURHFH/p1498053967451612)
-        //"files" input should be:
-        /*
-        * {
-         scripts: [{path: '', version: ''},{path: '', version: ''}]
-         styles: [{path: '', version: ''},{path: '', version: ''}]
-         }
+    async cacheAssets(files,key){
 
-        * */
-        let content = '';
+        let arr = Object.entries(files);
 
-        assets.forEach(async(asset,i)=>{
-
-            //scripts or styles list of files
-            if(asset && asset.length>0)//has an array of child objects
+        //type can be "scripts" or "styles"
+        for(let [type,assets] of arr){
+            if(assets.length>0)
             {
-                //get the file path
-                let assetPath = FileSystemDAL.getPath().join(this._basePath,asset.path);
+                let fileContent = '';
 
-                //check if it exists
-                if(await FileSystemDAL.resourceExists(assetPath)){
-                    //get the content of the file as string
-                    let assetContent = await FileSystemDAL.readResourceAsText(assetPath);
+                for(let i=0;i<assets.length;i++){
+                    let asset = assets[i];
 
-                    //script file content added to the existing
-                    //string so you gonna have only one script
-                    //to include in HTML.
-                    if(assets[i]==='scripts')
-                        content += assetContent;
-                    else {
+                    //get the file path, to copy the file content
+                    let assetPath = join(this._basePath,asset.path);
 
-                        let cssRelativePath = asset.path.replace('/[^\/]+$/','');
+                    //check if it exists
+                    let fileExists = await FileSystemDAL.resourceExists(assetPath);
 
-                        /*
-                        TODO: discuss with Joubel, this code is out of my small knowledge of PHP. Moreover looks a bit sensitive...
+                    //works on content
+                    if(fileExists){
+                        //get the content of the file as string
+                        let assetContent = await FileSystemDAL.readResourceAsText(assetPath);
 
-                         // Rewrite relative URLs used inside stylesheets
-                         $content .= preg_replace_callback(
-                         '/url\([\'"]?([^"\')]+)[\'"]?\)/i',
-                         function ($matches) use ($cssRelPath) {
-                            if (preg_match("/^(data:|([a-z0-9]+:)?\/)/i", $matches[1]) === 1) {
-                                return $matches[0]; // Not relative, skip
-                            }
-                            return 'url("../' . $cssRelPath . $matches[1] . '")';
-                         },
-                         $assetContent) . "\n";
-                        */
+                        //script file content added to the existing
+                        //string so you gonna have only one script
+                        //to include in HTML.
+                        if(type==='scripts')
+                            fileContent += assetContent;
+                        else {
+
+                            // Rewrite relative URLs used inside stylesheets
+                            let cssRelativePath = asset.path.replace('/[^\/]+$/','');
+
+                            //removes file name from path
+                            if(cssRelativePath.indexOf('.css')!==-1)
+                                cssRelativePath = cssRelativePath.split('/').slice(0,-1).join('/');
+
+                            //Joubel suggests:
+                            fileContent += assetContent.replace(/url\(['"]?([^"')]+)['"]?\)/ig, (match, p1) => {
+                                    if (p1.match(/^(data:|([a-z0-9]+:)?\/)/i) !== null) {
+                                        return match; // Not relative, skip
+                                    }
+                                    return 'url("../' + cssRelativePath+'/'+p1 + '")';
+                                }) + "\n";
+                        }
                     }
+                    else
+                        console.warn(`The file "${asset.path}" passed to "cacheAssets()" doesn't exist.`);
                 }
-                else
-                    console.warn(`The file "${asset.path}" passed to "cacheAssets()" doesn't exist.`);
+
+                //gets the extension and saves the file
+                //in the location where cached assets must be
+                let ext = (type==='scripts') ? JS_EXT : CSS_EXT;
+
+                let outputFile = `${key}.${ext}`;
+                outputFile = join(this._basePath,CACHED_ASSETS_PATH,outputFile);
+
+                await FileSystemDAL.writeResource(outputFile,fileContent);
+
+                //returns the two nodes, scripts and styles, with
+                //references to the new created files with merged
+                //contents.
+                files[type] = {
+                    path:outputFile,
+                    version:''
+                };
             }
-        });
+        }
+
+        return files;
     }
 
     /**
@@ -364,38 +388,34 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * Save files uploaded through the editor.
      * The files must be marked as temporary until the content form is saved.
      * @param editorFile {H5PEditorFile}
-     * @param contentID {string}
+     * @param [contentID] {string}
      * @return {Promise.<void>}
      */
     async saveResource(editorFile,contentID){
+        /*
         let storingPath = '';
 
-        if(contentID.trim().length===0)
+        if(!contentID)
             storingPath = this.getEditorPath();
         else
             storingPath = this.getContentPath(contentID);
 
         //appends to editor working path + 's' //TODO: what's that "s" (from PHP code)?
-        storingPath = FileSystemDAL.getPath().join(storingPath,editorFile.type,'s');
+        storingPath = join(storingPath,editorFile.type,'s');
 
         await FileSystemDAL.ensurePath(storingPath);
 
         //now also adds the name of the file
-        storingPath = FileSystemDAL.getPath().join(storingPath,editorFile.name);
+        storingPath = join(storingPath,editorFile.name);
 
         let fileContent = editorFile.getData();
         if(fileContent)
             await FileSystemDAL.writeResource(storingPath,fileContent);
         else{
             //TODO: PHP copy($_FILES['file']['tmp_name'], $path);
-            /*
-            * here the php code automatically access a global
-            * var in the request $_FILES providing the list
-            * of files uploaded from a POST request.
-            *
-            * Let's see how to implement this in nodejs
-            * */
+
         }
+        */
     }
 
     /**
@@ -407,7 +427,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @return {Promise.<string>}: null is resource doesn't exist
      */
     async getFullResourceItemPathFromContent(resourceItemPath, contentID){
-        let fullResPath = FileSystemDAL.getPath().join(this.getContentPath(contentID), resourceItemPath);
+        let fullResPath = join(this.getContentPath(contentID), resourceItemPath);
         return (await FileSystemDAL.resourceExists(fullResPath)) ? fullResPath : null;
     }
 
@@ -446,7 +466,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
             sourceLocation = this.getContentPath(fromContentID);
 
         //that's the full original path
-        let fullSourceResourceItemPath = FileSystemDAL.getPath().join(sourceLocation, resourceItemPath);
+        let fullSourceResourceItemPath = join(sourceLocation, resourceItemPath);
 
         //that's the full destination, where the content resource item will be cloned
         let destinationLocation = this.getContentPath(toContentID);
@@ -458,6 +478,49 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
                 fullSourceResourceItemPath,
                 fullDestinationResourceItemPath
             );
+    }
+
+    /**
+     * Copy a content from one directory to another. Defaults to cloning
+     * content from the current temporary upload folder to the editor path.
+     * @param opts {object}
+     *      [sourcePath] {string},
+     *      [contentID] {string}
+     * @return {Promise.<object>} Object containing h5p json and content json data
+     */
+    async cloneContentResources(opts){
+        let sourcePath = opts.sourcePath;
+        let contentID = opts.contentID;
+
+        if(!sourcePath)
+            return null;
+
+        //gets the path where the files
+        //of the content must be copied to
+        let contentTargetPath = (!contentID || contentID==='0') ? this.getEditorPath() : this.getContentPath(contentID);
+
+        //gets the source content path
+        let contentSourcePath = join(sourcePath,CONTENT_PATH);
+
+        //copies all content except for content.json
+        await FileSystemDAL.deepCopy(contentSourcePath,contentTargetPath,true, {
+            equalTo:['.','..',H5P_CONTENT_CONFIG_FILE_NAME], //file names equal to these
+        });
+
+        //reads the JSONs files of H5P package (h5p.json and content.json)
+        //to return that JSONs to the client
+        let h5pConfig = JSON.parse(
+            await FileSystemDAL.readResourceAsText(join(contentSourcePath,H5P_CONFIG_FILE_NAME))
+        );
+
+        let h5pContentConfig = JSON.parse(
+            await FileSystemDAL.readResourceAsText(join(contentSourcePath,H5P_CONTENT_CONFIG_FILE_NAME))
+        );
+
+        return {
+            'h5pJson':h5pConfig,
+            'contentJson':h5pContentConfig
+        };
     }
 
     /**
@@ -488,7 +551,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
      * @return {string}
      */
     getEditorPath(){
-        return this._altEditorPath || FileSystemDAL.getPath().join(this._basePath,EDITOR_PATH);
+        return this._altEditorPath || join(this._basePath,EDITOR_PATH);
     }
 
     /**

@@ -12,7 +12,7 @@ const H5PLib = require('../h5h-lib');
 const TestVars = require('./SharedTestVars');
 
 
-describe('Class FileSystemDAL:', ()=> {
+describe('Class FileSystemDAL:', async()=> {
 
     //Deep copy is an important function since it is invoked
     //in many functions in the app to manage the filesystem
@@ -71,6 +71,5 @@ describe('Class FileSystemDAL:', ()=> {
 
         assert.equal(testResult,true);
     });
-
 
 });

@@ -45,7 +45,6 @@ class FileSystemDAL {
     static async readResourceAsText(pathTo,encoding){
         pathTo = path.resolve(pathTo);
         encoding = encoding || DEFAULT_ENCODING;
-
         return await fsx.readFile(pathTo,encoding);
     };
 
@@ -280,6 +279,17 @@ class FileSystemDAL {
             allowedList:allowedList,
             ignoreOpts:ignoreOpts
         };
+    }
+
+    /**
+     * List of files available files
+     * from the given path.
+     * @param pathTo {string}
+     * @return {Promise.<string>}
+     */
+    static async readDir(pathTo){
+        pathTo = path.resolve(pathTo);
+        return await recursiveRead(pathTo);
     }
 
     /**
