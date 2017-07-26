@@ -12,12 +12,12 @@ module.exports = {
      * data, under this project
      * @type string
      */
-    DATA_PATH : './test/sample-data',
+    TEST_DATA_PATH : './test/test-data',
 
     /**
      * A sample .h5p library to
      * use for testing
      * @type string
      */
-    SAMPLE_LIBRARY_PATH : './test/sample-data/MyLib-1.0'
+    SAMPLE_LIBRARY_PATH : './test/test-data/MyLib-1.0'
 }

@@ -21,7 +21,7 @@ describe('H5P Libraries Management:', async()=> {
 
         try{
             let storageStrat = new H5PLib.H5PLibraryDefaultStorageStrategy({
-                basePath:'./h5p-packages'
+                basePath:'./h5p-packages-repository'
             });
 
             let libMng = new H5PLib.H5PLibraryManager(storageStrat);
@@ -61,7 +61,7 @@ describe('H5P Libraries Management:', async()=> {
 
 
         let storageStrat = new H5PLib.H5PLibraryDefaultStorageStrategy({
-            basePath:TestVars.DATA_PATH
+            basePath:TestVars.TEST_DATA_PATH
         });
 
         let merge = await storageStrat.cacheAssets(data,'my-key');
