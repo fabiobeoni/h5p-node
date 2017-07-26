@@ -387,12 +387,11 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
     /**
      * Save files uploaded through the editor.
      * The files must be marked as temporary until the content form is saved.
-     * @param editorFile {H5PEditorFile}
+     * @param editorFile {H5PEditorUpload}
      * @param [contentID] {string}
-     * @return {Promise.<void>}
+     * @return {Promise.<H5PEditorUpload>}
      */
     async saveResource(editorFile,contentID){
-        /*
         let storingPath = '';
 
         if(!contentID)
@@ -401,21 +400,21 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
             storingPath = this.getContentPath(contentID);
 
         //appends to editor working path + 's' //TODO: what's that "s" (from PHP code)?
-        storingPath = join(storingPath,editorFile.type,'s');
+        storingPath = join(storingPath,editorFile.getType(),'s');
 
         await FileSystemDAL.ensurePath(storingPath);
 
         //now also adds the name of the file
-        storingPath = join(storingPath,editorFile.name);
+        storingPath = join(storingPath,editorFile.getName());
 
         let fileContent = editorFile.getData();
         if(fileContent)
             await FileSystemDAL.writeResource(storingPath,fileContent);
-        else{
-            //TODO: PHP copy($_FILES['file']['tmp_name'], $path);
+        else
+            //PHP copy($_FILES['file']['tmp_name'], $path);
+            await FileSystemDAL.copyResource(editorFile.fileInfo.tempName,storingPath);
 
-        }
-        */
+        return editorFile;
     }
 
     /**

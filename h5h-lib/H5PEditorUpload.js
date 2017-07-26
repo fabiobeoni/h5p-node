@@ -1,22 +1,14 @@
 const uuid = require('uuid');
-const Base64 = require('base-64');
 const imageInfo = require('imageinfo');
 const FileSystemDAL = require('./FileSystemDAL');
 
 const CLASS_NAME = 'H5PUploadedFileInfo';
 
-class H5PUploadedFileInfo {
-    constructor(){
-        this.name = '';
-        this.size = 0;
-        this.type = '';
-        this.mimes = [];
-        this.extension = '';
-        this.tempName = '';
-        this.base64Data = null;
-    }
-}
-
+/**
+ * Represent a resource uploaded
+ * to from the H5PEditor.
+ *
+ */
 class H5PEditorUpload  {
 
     /**
@@ -273,6 +265,18 @@ class H5PEditorUpload  {
     getResult(){
         this.result.path = FileSystemDAL.getPath().join(this.getType(),'s',this.getName());
         return this.result;
+    }
+}
+
+class H5PUploadedFileInfo {
+    constructor(){
+        this.name = '';
+        this.size = 0;
+        this.type = '';
+        this.mimes = [];
+        this.extension = '';
+        this.tempName = '';
+        this.base64Data = null;
     }
 }
 
