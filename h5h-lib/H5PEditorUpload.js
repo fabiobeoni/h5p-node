@@ -7,7 +7,6 @@ const CLASS_NAME = 'H5PUploadedFileInfo';
 /**
  * Represent a resource uploaded
  * to from the H5PEditor.
- *
  */
 class H5PEditorUpload  {
 
@@ -268,6 +267,11 @@ class H5PEditorUpload  {
     }
 }
 
+/**
+ * Utility class handling
+ * resource upload data
+ * and basic metadata.
+ */
 class H5PUploadedFileInfo {
     constructor(){
         this.name = '';
