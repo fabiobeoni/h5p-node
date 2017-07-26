@@ -190,6 +190,16 @@ class H5PAbstractLibraryStorageStrategy {
     async cloneContentResourceItem(resourceItemPath, fromContentID, toContentID) {throw MESSAGE+'cloneContentResourceItem().';}
 
     /**
+     * Copy a content from one directory to another. Defaults to cloning
+     * content from the current temporary upload folder to the editor path.
+     * @param opts {object}
+     *      [sourcePath] {string},
+     *      [contentID] {string}
+     * @return {Promise.<object>} Object containing h5p json and content json data
+     */
+    async cloneContentResources(opts){throw MESSAGE+'cloneContentResources().';}
+
+    /**
      * Returns a temp dir with unique name.
      * Not sure that is really needed in
      * nodejs.

@@ -49,6 +49,17 @@ class FileSystemDAL {
     };
 
     /**
+     * Reads the content of the given
+     * path and returns it as a stream.
+     * @param pathTo {string}
+     * @return {Promise.<Buffer>}
+     */
+    static async readResource(pathTo){
+        pathTo = path.resolve(pathTo);
+        return await fsx.readFile(pathTo);
+    };
+
+    /**
      * Writes the given content to
      * the the provided file path.
      * @param pathTo {string}
