@@ -2,7 +2,7 @@
  * This test is a selection of the most
  * complex functions performed by the
  * framework that is crucial to test.
- * The test uses data from ./test/sample-data
+ * The test uses data from ./test/test-data
  * folder.
  */
 const assert = require('assert');
@@ -15,7 +15,6 @@ const TestVars = require('./SharedTestVars');
 describe('H5P Libraries Management:', async()=> {
 
     //Requires writable folder
-    /**/
     it('Saves h5p package from upload folder to libraries repository', async ()=> {
         let isFullyStored = false;
 
@@ -41,7 +40,6 @@ describe('H5P Libraries Management:', async()=> {
 
         assert.equal(isFullyStored,true);
     });
-
 
     it('cacheAssets(): Get a list of files to merge and put in a cache', async()=>{
 
@@ -70,4 +68,5 @@ describe('H5P Libraries Management:', async()=> {
 
         assert.equal(hasResult,true);
     });
+
 });

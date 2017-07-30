@@ -27,6 +27,8 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
 
     /**
      * Initializes the H5PLibraryDefaultStorageStrategy
+     * and makes sure all needed directories are
+     * available.
      * @param opts {object}:
      *
      *      basePath {string}:
@@ -120,7 +122,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
     //TODO: check https://h5ptechnology.slack.com/archives/C36BURHFH/p1497872148219359
     /**
      * Async gets the all library contents from the
-     * by the given content.id and stores them under
+     * the given content.id and stores them under
      * the main content app storage path and content
      * ID.
      * @param sourcePath {string}: content source path
