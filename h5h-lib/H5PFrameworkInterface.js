@@ -36,7 +36,7 @@ class H5PFrameworkInterface {
      *
      * @param message {string}
      */
-    setErrorMessage($message){ throw `${NAME}.setErrorMessage(): missing implementation.`};
+    setErrorMessage(message){ throw `${NAME}.setErrorMessage(): missing implementation.`};
 
     /**
      * Show the user an information message
