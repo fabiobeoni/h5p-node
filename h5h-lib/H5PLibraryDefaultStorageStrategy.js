@@ -1,4 +1,4 @@
-require('./H5PSharedConstants');
+const SHC = require('./H5PSharedConstants');
 
 const LIBRARIES_PATH = 'libraries';
 const CONTENT_PATH = 'content';
@@ -26,6 +26,23 @@ const join = FileSystemDAL.getPath().join;
 class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy {
 
     /**
+     * Exposes the internal constants
+     * defining the working dirs to make
+     * them available to the client
+     * for testing purposes
+     * @return {{LIBRARIES_PATH: string, CONTENT_PATH: string, EXPORTS_PATH: string, CACHED_ASSETS_PATH: string, EDITOR_PATH: string}}
+     */
+    static getWorkingPaths(){
+        return {
+            LIBRARIES_PATH:LIBRARIES_PATH,
+            CONTENT_PATH:CONTENT_PATH,
+            EXPORTS_PATH:EXPORTS_PATH,
+            CACHED_ASSETS_PATH:CACHED_ASSETS_PATH,
+            EDITOR_PATH:EDITOR_PATH
+            };
+    };
+
+    /**
      * Initializes the H5PLibraryDefaultStorageStrategy
      * and makes sure all needed directories are
      * available.
@@ -49,6 +66,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
 
         //creates all needed sub paths to work with...
         Promise.all([
+            FileSystemDAL.ensurePath(join(this._basePath,EDITOR_PATH)),
             FileSystemDAL.ensurePath(join(this._basePath,LIBRARIES_PATH)),
             FileSystemDAL.ensurePath(join(this._basePath,EXPORTS_PATH)),
             FileSystemDAL.ensurePath(join(this._basePath,CONTENT_PATH)),
@@ -295,7 +313,7 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
 
                 //gets the extension and saves the file
                 //in the location where cached assets must be
-                let ext = (type==='scripts') ? JS_EXT : CSS_EXT;
+                let ext = (type==='scripts') ? SHC.JS_EXT : SHC.CSS_EXT;
 
                 let outputFile = `${key}.${ext}`;
                 outputFile = join(this._basePath,CACHED_ASSETS_PATH,outputFile);
@@ -337,8 +355,8 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
     async getCachedAssets(key){
         let files = {};
 
-        let jsCachedFile = this.getCachedAssetsSrc(key,JS_EXT);
-        let cssCachedFile = this.getCachedAssetsSrc(key,CSS_EXT);
+        let jsCachedFile = this.getCachedAssetsSrc(key,SHC.JS_EXT);
+        let cssCachedFile = this.getCachedAssetsSrc(key,SHC.CSS_EXT);
 
         if(FileSystemDAL.resourceExists(jsCachedFile))
             files.scripts = [{
@@ -505,17 +523,17 @@ class H5PLibraryDefaultStorageStrategy extends H5PAbstractLibraryStorageStrategy
 
         //copies all content except for content.json
         await FileSystemDAL.deepCopy(contentSourcePath,contentTargetPath,true, {
-            equalTo:['.','..',H5P_CONTENT_CONFIG_FILE_NAME], //file names equal to these
+            equalTo:['.','..',SHC.H5P_CONTENT_CONFIG_FILE_NAME], //file names equal to these
         });
 
         //reads the JSONs files of H5P package (h5p.json and content.json)
         //to return that JSONs to the client
         let h5pConfig = JSON.parse(
-            await FileSystemDAL.readResourceAsText(join(contentSourcePath,H5P_CONFIG_FILE_NAME))
+            await FileSystemDAL.readResourceAsText(join(contentSourcePath,SHC.H5P_CONFIG_FILE_NAME))
         );
 
         let h5pContentConfig = JSON.parse(
-            await FileSystemDAL.readResourceAsText(join(contentSourcePath,H5P_CONTENT_CONFIG_FILE_NAME))
+            await FileSystemDAL.readResourceAsText(join(contentSourcePath,SHC.H5P_CONTENT_CONFIG_FILE_NAME))
         );
 
         return {
