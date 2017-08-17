@@ -1,5 +1,6 @@
-const NAME = 'H5PframeworkInterface';
+const NAME = 'H5PFrameworkInterface';
 const MSG = ': missing implementation.';
+
 
 class H5PFrameworkInterface {
 
@@ -22,7 +23,7 @@ class H5PFrameworkInterface {
      * @param stream {string} Path to where the file should be saved. Can be null.
      * @return {string} The content (response body). NULL if something went wrong
      */
-    fetchExternalData(url, data, blocking, stream){throw `${NAME}.fetchExternalData()${MSG}`};
+    fetchExternalData(url, data=null, blocking=true, stream=null){throw `${NAME}.fetchExternalData()${MSG}`};
 
     /**
      * Set the tutorial URL for a library. All versions of the library is set
@@ -61,7 +62,7 @@ class H5PFrameworkInterface {
      *      content
      * @return {string} Translated string
      */
-    t(message, replacements){ throw `${NAME}.t()${MSG}`};
+    t(message, replacements = {}){ throw `${NAME}.t()${MSG}`};
 
     /**
      * Get URL to file in the specific library
@@ -379,6 +380,203 @@ class H5PFrameworkInterface {
      */
     alterLibrarySemantics(semantics, machineName, majorVersion, minorVersion){ throw `${NAME}.alterLibrarySemantics()${MSG}`};
 
+    /**
+     * Delete all dependencies belonging to given library
+     *
+     * @param {number} libraryId
+     *   Library identifier
+     */
+    deleteLibraryDependencies(libraryId){ throw `${NAME}.deleteLibraryDependencies()${MSG}`};
+
+    /**
+     * Start an atomic operation against the dependency storage
+     */
+    lockDependencyStorage(){ throw `${NAME}.lockDependencyStorage()${MSG}`};
+
+    /**
+     * Stops an atomic operation against the dependency storage
+     */
+    unlockDependencyStorage(){ throw `${NAME}.unlockDependencyStorage()${MSG}`};
+
+    /**
+     * Delete a library from database and file system
+     *
+     * @param {object} library
+     *   Library object with id, name, major version and minor version.
+     */
+    deleteLibrary(library){ throw `${NAME}.deleteLibrary()${MSG}`};
+
+    /**
+     * Load content.
+     *
+     * @param int id
+     *   Content identifier
+     * @return {object}:
+     *   - contentId: Identifier for the content
+     *   - params: json content as string
+     *   - embedType: csv of embed types
+     *   - title: The contents title
+     *   - language: Language code for the content
+     *   - libraryId: Id for the main library
+     *   - libraryName: The library machine name
+     *   - libraryMajorVersion: The library's majorVersion
+     *   - libraryMinorVersion: The library's minorVersion
+     *   - libraryEmbedTypes: CSV of the main library's embed types
+     *   - libraryFullscreen: 1 if fullscreen is supported. 0 otherwise.
+     */
+    loadContent(id){ throw `${NAME}.loadContent()${MSG}`};
+
+    /**
+     * Load dependencies for the given content of the given type.
+     *
+     * @param {number} id
+     *   Content identifier
+     * @param {string} [type]
+     *   Dependency types. Allowed values:
+     *   - editor
+     *   - preloaded
+     *   - dynamic
+     * @return {object}:
+     *   List of associative arrays containing:
+     *   - libraryId: The id of the library if it is an existing library.
+     *   - machineName: The library machineName
+     *   - majorVersion: The library's majorVersion
+     *   - minorVersion: The library's minorVersion
+     *   - patchVersion: The library's patchVersion
+     *   - preloadedJs(optional): comma separated string with js file paths
+     *   - preloadedCss(optional): comma separated sting with css file paths
+     *   - dropCss(optional): csv of machine names
+     */
+    loadContentDependencies(id, type){ throw `${NAME}.loadContentDependencies()${MSG}`};
+
+    /**
+     * Get stored setting.
+     *
+     * @param {string} name
+     *   Identifier for the setting
+     * @param {string} [_default]
+     *   Optional default value if settings is not set
+     * @return {object|string|number|boolean}
+     *   Whatever has been stored as the setting
+     */
+    getOption(name, _default){ throw `${NAME}.getOption()${MSG}`};
+
+    /**
+     * Stores the given setting.
+     * For example when did we last check h5p.org for updates to our libraries.
+     *
+     * @param {string} name
+     *   Identifier for the setting
+     * @param {object|string|number|boolean} value Data
+     *   Whatever we want to store as the setting
+     */
+    setOption(name, value){ throw `${NAME}.setOption()${MSG}`};
+
+    /**
+     * This will update selected fields on the given content.
+     *
+     * @param {number} id Content identifier
+     * @param {string[]} fields Content fields, e.g. filtered or slug.
+     */
+    updateContentFields(id, fields){ throw `${NAME}.updateContentFields()${MSG}`};
+
+    /**
+     * Will clear filtered params for all the content that uses the specified
+     * library. This means that the content dependencies will have to be rebuilt,
+     * and the parameters re-filtered.
+     *
+     * @param {number} library_id
+     */
+    clearFilteredParameters(library_id){ throw `${NAME}.clearFilteredParameters()${MSG}`};
+
+    /**
+     * Get number of contents that has to get their content dependencies rebuilt
+     * and parameters re-filtered.
+     *
+     * @return {number}
+     */
+    getNumNotFiltered(){ throw `${NAME}.getNumNotFiltered()${MSG}`};
+
+    /**
+     * Get number of contents using library as main library.
+     *
+     * @param {number} libraryId
+     * @return {number}
+     */
+    getNumContent(libraryId){ throw `${NAME}.getNumContent()${MSG}`};
+
+    /**
+     * Determines if content slug is used.
+     *
+     * @param {string} slug
+     * @return {boolean}
+     */
+    isContentSlugAvailable(slug){ throw `${NAME}.isContentSlugAvailable()${MSG}`};
+
+    /**
+     * Generates statistics from the event log per library
+     *
+     * @param {string} type Type of event to generate stats for
+     * @return {number[]} Number values indexed by library name and version
+     */
+    getLibraryStats(type){ throw `${NAME}.getLibraryStats()${MSG}`};
+
+    /**
+     * Aggregate the current number of H5P authors
+     * @return {number}
+     */
+    getNumAuthors(){ throw `${NAME}.getNumAuthors()${MSG}`};
+
+    /**
+     * Stores hash keys for cached assets, aggregated JavaScripts and
+     * stylesheets, and connects it to libraries so that we know which cache file
+     * to delete when a library is updated.
+     *
+     * @param {string} key
+     *  Hash key for the given libraries
+     * @param {object[]} libraries
+     *  List of dependencies(libraries) used to create the key
+     */
+    saveCachedAssets(key, libraries){ throw `${NAME}.saveCachedAssets()${MSG}`};
+
+    /**
+     * Locate hash keys for given library and delete them.
+     * Used when cache file are deleted.
+     *
+     * @param {number} library_id
+     *  Library identifier
+     * @return {string[]}
+     *  List of hash keys removed
+     */
+    deleteCachedAssets(library_id){ throw `${NAME}.deleteCachedAssets()${MSG}`}
+
+    /**
+     * Get the amount of content items associated to a library
+     * return {number}
+     */
+    getLibraryContentCount(){ throw `${NAME}.getLibraryContentCount()${MSG}`}
+
+    /**
+     * Will trigger after the export file is created.
+     */
+    afterExportCreated(content, filename){ throw `${NAME}.afterExportCreated()${MSG}`}
+
+    /**
+     * Check if user has permissions to an action
+     *
+     * @param  {H5PPermission} [permission] Permission type, ref H5PPermission
+     * @param  {number}          [id]       Id need by platform to determine permission
+     * @return {boolean}
+     */
+    hasPermission(permission, id){ throw `${NAME}.hasPermission()${MSG}`}
+
+    /**
+     * Replaces existing content type cache with the one passed in
+     *
+     * @param {object} contentTypeCache: Json with an array called 'libraries'
+     *  containing the new content type cache that should replace the old one.
+     */
+    replaceContentTypeCache(contentTypeCache){ throw `${NAME}.replaceContentTypeCache()${MSG}`}
 }
 
-module.exports = H5PframeworkInterface;
+module.exports = H5PFrameworkInterface;
